@@ -125,22 +125,45 @@ namespace WebAppExample.Controllers
         [HttpPost]
         public ActionResult Delete(string id, FormCollection collection)
         {// TODO: Add delete logic here------------------------------
-            NorthwindEntities dbcontext = new NorthwindEntities();
-            Customer customer = dbcontext.Customers.Find(id);
-            List<Order> orders = dbcontext.Orders.Where(x => x.CustomerID == id).ToList();
-            //--------if customer is in Order list---------
-            if (orders.Count > 0)
+            try
             {
-                ViewBag.Message = "Can't delete, there are orders.";
-                return View(customer);
-            }
-            else
-            {
+                NorthwindEntities dbcontext = new NorthwindEntities();
+                Customer customer = dbcontext.Customers.Find(id);
+                Order_Detail dets = new Order_Detail();
+                var orders = dbcontext.Orders.Where(x => x.CustomerID == id);
+                var orderDetailRecords =
+                    from order in dbcontext.Orders
+                    join Order_Detail in dbcontext.Order_Details on order.OrderID equals Order_Detail.OrderID
+                    select Order_Detail;
+                dbcontext.Order_Details.RemoveRange(orderDetailRecords.ToList());
                 dbcontext.Customers.Remove(customer);
-                dbcontext.SaveChanges();
+                return RedirectToAction("Index");
             }
+            catch(Exception ex)
+            {
+                ViewBag.exception = ex.Message;
+                return RedirectToAction("Index", collection);
+            }
+            
+            //--identify other records
 
-            return RedirectToAction("Index", collection);
+            //    select*
+            //    from Orders
+            //    where CustomerID = 'ALFKI'
+            
+            ////--------if customer is in Order list---------
+            //if (orders.Count > 0)
+            //{
+            //    ViewBag.Message = "Can't delete, there are orders.";
+            //    return View(customer);
+            //}
+            //else
+            //{
+            //    dbcontext.Customers.Remove(customer);
+            //    dbcontext.SaveChanges();
+            //}
+
+            
 
         }
     }

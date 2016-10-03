@@ -28,5 +28,6 @@ namespace WebAppExample
         public virtual DbSet<Customer> Customers { get; set; }
         public virtual DbSet<Employee> Employees { get; set; }
         public virtual DbSet<Order> Orders { get; set; }
+        public virtual DbSet<Order_Detail> Order_Details { get; set; }
     }
 }
